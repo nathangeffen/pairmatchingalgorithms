@@ -1,0 +1,5 @@
+df = read.csv("timing_k_tests.csv", comment.char = "#")
+results = aggregate(df$Value, by=list(df$k),FUN=mean)
+results = data.frame(k=results[,1],Speed=round(results[,2]))
+require(xtable)
+xtable(results)
