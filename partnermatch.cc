@@ -1,6 +1,7 @@
-/* Code to test partner matching algorithms.
-   Copyright (C) Nathan Geffen.
-   See LICENSE file for copyright details.
+/**
+    Code to test partner matching algorithms.
+    Copyright (C) Nathan Geffen.
+    See LICENSE file for copyright details.
 */
 
 #include <cassert>
@@ -30,11 +31,12 @@
 
 #define GRAPH_ACCURACY 10000
 
+/* Used to keep track of the effectiveness of pair-matching algorithms. */
+
 struct Effectiveness {
   uint64_t avg_rank = 0;
   double avg_distance = 0.0;
 };
-
 
 class Agent;
 
@@ -99,14 +101,18 @@ void dist_sort (RandomAccessIterator first, RandomAccessIterator last,
   }
 }
 
+/* Macros used by distribution matching. */
 
 #define DOB_DIM 100
 #define SEX_DIM 2
 #define SEXOR_DIM 2
 #define NUM_BUCKETS (DOB_DIM * SEX_DIM * SEXOR_DIM)
-
 #define GET_BUCKET(age, sex, sexor)			\
   (SEX_DIM * sex + SEXOR_DIM * sexor + (age - MIN_AGE))
+
+/**
+   Tracks information about individual agents and contains agent-specific methods.
+*/
 
 class Agent {
 public:
@@ -140,6 +146,11 @@ public:
     return std::sqrt(x_d * x_d + y_d * y_d);
   }
 
+
+  /**
+     Depending on whether the code is compiled for the first ATTRACTREJECT or
+     STIMOD simulation, a different distance function is implemented.
+   */
 
 #ifdef ATTRACT_REJECT
   double distance(const Agent &a, uint64_t partner_count = 0)
@@ -563,6 +574,9 @@ public:
     }
   }
 
+  /*
+    Construct graph file for Blossom V, execute Blossom V and then read its output.
+   */
   void blossom()
   {
     sort(agents.begin(), agents.end(), [&](Agent *a, Agent *b)
@@ -604,13 +618,6 @@ public:
       agents[to]->partners.push_back(agents[from]);
     }
     fclose(f);
-    // DEBUGGING
-    // f = fopen("tmp_bl.csv", "w");
-    // for (auto & agent: agents) {
-    //   fprintf(f, "%lu,%lu,%.2f\n", agent->id, agent->partners.back()->id,
-    //           agent->distance(*agent->partners.back(),1));
-    // }
-    // fclose(f);
   }
 
 
@@ -692,6 +699,8 @@ struct measure
     return duration.count();
   }
 };
+
+/* Some generic statistivcal functions. */
 
 template<class InputIterator> double
 median (InputIterator  from, InputIterator to, bool sorted = false)
